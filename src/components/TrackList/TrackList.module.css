@@ -1,0 +1,140 @@
+.trackList {
+  width: 100%;
+}
+
+.header {
+  display: grid;
+  grid-template-columns: 40px 1fr 1fr 80px;
+  gap: 16px;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 4px;
+}
+
+.headerCell {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-subdued);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.track {
+  display: grid;
+  grid-template-columns: 40px 1fr 1fr 80px;
+  gap: 16px;
+  padding: 8px 16px;
+  border-radius: 4px;
+  transition: background 0.15s ease;
+  align-items: center;
+  cursor: pointer;
+  animation: fadeIn 0.3s ease forwards;
+  opacity: 0;
+}
+
+.track:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.trackPlaying {
+  composes: track;
+}
+
+.trackPlaying .trackNumber {
+  color: var(--spotify-green);
+}
+
+.trackPlaying .songTitle {
+  color: var(--spotify-green);
+}
+
+.trackNumber {
+  font-size: 14px;
+  color: var(--text-subdued);
+  text-align: center;
+  position: relative;
+}
+
+.playIndicator {
+  display: none;
+}
+
+.track:hover .trackNumber span {
+  display: none;
+}
+
+.track:hover .playIndicator {
+  display: inline;
+  font-size: 12px;
+}
+
+.songInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.songCover {
+  width: 40px;
+  height: 40px;
+  border-radius: 4px;
+  background: var(--bg-elevated);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.songDetails {
+  min-width: 0;
+}
+
+.songTitle {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.songArtist {
+  font-size: 12px;
+  color: var(--text-subdued);
+  margin-top: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.songArtist:hover {
+  color: var(--text-primary);
+  text-decoration: underline;
+}
+
+.albumName {
+  font-size: 13px;
+  color: var(--text-subdued);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.albumName:hover {
+  color: var(--text-primary);
+  text-decoration: underline;
+}
+
+.duration {
+  font-size: 13px;
+  color: var(--text-subdued);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
