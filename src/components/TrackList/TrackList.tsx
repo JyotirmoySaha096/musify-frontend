@@ -2,7 +2,18 @@
 
 import React from 'react';
 import Link from 'next/link';
-import styles from './TrackList.module.css';
+import Box from '@mui/material/Box';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Typography from '@mui/material/Typography';
+import Stack from '@mui/material/Stack';
+import Avatar from '@mui/material/Avatar';
+import MusicNoteIcon from '@mui/icons-material/MusicNote';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import { usePlayer } from '@/context/PlayerContext';
 
 interface Track {
@@ -38,66 +49,126 @@ export default function TrackList({
   };
 
   return (
-    <div className={styles.trackList}>
-      {showHeader && (
-        <div className={styles.header}>
-          <div className={styles.headerCell}>#</div>
-          <div className={styles.headerCell}>Title</div>
-          {showAlbum && <div className={styles.headerCell}>Album</div>}
-          <div className={styles.headerCell}>⏱</div>
-        </div>
-      )}
-      {tracks.map((track, index) => {
-        const isCurrent = currentTrack?.id === track.id;
+    <TableContainer>
+      <Table size="small">
+        {showHeader && (
+          <TableHead>
+            <TableRow sx={{ '&:hover': { bgcolor: 'transparent' } }}>
+              <TableCell sx={{ width: 40 }}>#</TableCell>
+              <TableCell>Title</TableCell>
+              {showAlbum && <TableCell>Album</TableCell>}
+              <TableCell align="right" sx={{ width: 80 }}>
+                ⏱
+              </TableCell>
+            </TableRow>
+          </TableHead>
+        )}
+        <TableBody>
+          {tracks.map((track, index) => {
+            const isCurrent = currentTrack?.id === track.id;
 
-        return (
-          <div
-            key={track.id}
-            className={isCurrent ? styles.trackPlaying : styles.track}
-            onClick={() => handlePlayTrack(track, index)}
-            style={{ animationDelay: `${index * 30}ms` }}
-          >
-            <div className={styles.trackNumber}>
-              {isCurrent && isPlaying ? (
-                <span style={{ color: 'var(--spotify-green)' }}>♫</span>
-              ) : (
-                <>
-                  <span>{index + 1}</span>
-                  <span className={styles.playIndicator}>▶</span>
-                </>
-              )}
-            </div>
-
-            <div className={styles.songInfo}>
-              <div className={styles.songCover}>🎵</div>
-              <div className={styles.songDetails}>
-                <div className={styles.songTitle}>{track.title}</div>
-                <Link
-                  href={`/artist/${track.artist?.id}`}
-                  className={styles.songArtist}
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  {track.artist?.name}
-                </Link>
-              </div>
-            </div>
-
-            {showAlbum && (
-              <Link
-                href={`/album/${track.album?.id}`}
-                className={styles.albumName}
-                onClick={(e) => e.stopPropagation()}
+            return (
+              <TableRow
+                key={track.id}
+                onClick={() => handlePlayTrack(track, index)}
+                sx={{
+                  animation: 'fadeIn 0.3s ease forwards',
+                  animationDelay: `${index * 30}ms`,
+                  opacity: 0,
+                  '& .track-number': { display: 'inline' },
+                  '& .play-indicator': { display: 'none' },
+                  '&:hover': {
+                    '& .track-number': { display: 'none' },
+                    '& .play-indicator': { display: 'inline-flex' },
+                  },
+                }}
               >
-                {track.album?.title}
-              </Link>
-            )}
+                <TableCell sx={{ color: isCurrent ? 'primary.main' : 'text.disabled', textAlign: 'center' }}>
+                  {isCurrent && isPlaying ? (
+                    <MusicNoteIcon sx={{ fontSize: 16, color: 'primary.main' }} />
+                  ) : (
+                    <>
+                      <Typography component="span" className="track-number" variant="body2">
+                        {index + 1}
+                      </Typography>
+                      <PlayArrowIcon className="play-indicator" sx={{ fontSize: 16 }} />
+                    </>
+                  )}
+                </TableCell>
 
-            <div className={styles.duration}>
-              {formatDuration(track.durationSeconds)}
-            </div>
-          </div>
-        );
-      })}
-    </div>
+                <TableCell>
+                  <Stack direction="row" alignItems="center" spacing={1.5} sx={{ minWidth: 0 }}>
+                    <Avatar
+                      variant="rounded"
+                      sx={{
+                        width: 40,
+                        height: 40,
+                        bgcolor: '#242424',
+                        fontSize: 16,
+                      }}
+                    >
+                      <MusicNoteIcon sx={{ color: 'text.secondary', fontSize: 18 }} />
+                    </Avatar>
+                    <Box sx={{ minWidth: 0 }}>
+                      <Typography
+                        variant="body2"
+                        noWrap
+                        sx={{ color: isCurrent ? 'primary.main' : 'text.primary' }}
+                      >
+                        {track.title}
+                      </Typography>
+                      <Typography
+                        component={Link}
+                        href={`/artist/${track.artist?.id}`}
+                        variant="caption"
+                        color="text.disabled"
+                        noWrap
+                        onClick={(e) => e.stopPropagation()}
+                        sx={{
+                          display: 'block',
+                          '&:hover': {
+                            color: 'text.primary',
+                            textDecoration: 'underline',
+                          },
+                        }}
+                      >
+                        {track.artist?.name}
+                      </Typography>
+                    </Box>
+                  </Stack>
+                </TableCell>
+
+                {showAlbum && (
+                  <TableCell>
+                    <Typography
+                      component={Link}
+                      href={`/album/${track.album?.id}`}
+                      variant="body2"
+                      color="text.disabled"
+                      noWrap
+                      onClick={(e) => e.stopPropagation()}
+                      sx={{
+                        '&:hover': {
+                          color: 'text.primary',
+                          textDecoration: 'underline',
+                        },
+                      }}
+                    >
+                      {track.album?.title}
+                    </Typography>
+                  </TableCell>
+                )}
+
+                <TableCell align="right">
+                  <Typography variant="body2" color="text.disabled" sx={{ fontVariantNumeric: 'tabular-nums' }}>
+                    {formatDuration(track.durationSeconds)}
+                  </Typography>
+                </TableCell>
+              </TableRow>
+            );
+          })}
+        </TableBody>
+      </Table>
+    </TableContainer>
   );
 }

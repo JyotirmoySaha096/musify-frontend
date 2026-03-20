@@ -2,7 +2,10 @@
 
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
-import styles from '../../detail.module.css';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import Fab from '@mui/material/Fab';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import TrackList from '@/components/TrackList/TrackList';
 import Card, { CardGrid } from '@/components/Card/Card';
 import { artistsApi } from '@/lib/api';
@@ -25,14 +28,25 @@ export default function ArtistPage() {
   }, [params.id]);
 
   if (loading) {
-    return <div className={styles.loading}>Loading artist...</div>;
+    return (
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 400 }}>
+        <Typography variant="body2" color="text.disabled">
+          Loading artist...
+        </Typography>
+      </Box>
+    );
   }
 
   if (!artist) {
-    return <div className={styles.loading}>Artist not found</div>;
+    return (
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 400 }}>
+        <Typography variant="body2" color="text.disabled">
+          Artist not found
+        </Typography>
+      </Box>
+    );
   }
 
-  // Flatten all songs from albums for "Popular" section
   const allSongs = artist.songs || [];
 
   const handlePlayAll = () => {
@@ -42,33 +56,96 @@ export default function ArtistPage() {
   };
 
   return (
-    <div className={styles.detailPage}>
-      <div className={styles.heroPurple}>
-        <div className={styles.coverArtRound}>🎤</div>
-        <div className={styles.heroInfo}>
-          <div className={styles.heroType}>Artist</div>
-          <h1 className={styles.heroTitle}>{artist.name}</h1>
-          {artist.bio && <p className={styles.heroBio}>{artist.bio}</p>}
-        </div>
-      </div>
+    <Box>
+      {/* Hero */}
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'flex-end',
+          gap: 3,
+          p: '40px 32px 24px',
+          background: 'linear-gradient(180deg, rgba(140,103,172,0.4) 0%, #121212 100%)',
+          minHeight: 280,
+        }}
+      >
+        <Box
+          sx={{
+            width: 232,
+            height: 232,
+            borderRadius: '50%',
+            bgcolor: '#242424',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: 80,
+            flexShrink: 0,
+            boxShadow: '0 16px 48px rgba(0,0,0,0.6)',
+            animation: 'scaleIn 0.4s ease',
+          }}
+        >
+          🎤
+        </Box>
+        <Box sx={{ flex: 1, minWidth: 0, animation: 'fadeIn 0.4s ease' }}>
+          <Typography
+            variant="overline"
+            sx={{ fontWeight: 700, letterSpacing: 1, mb: 1, display: 'block' }}
+          >
+            Artist
+          </Typography>
+          <Typography
+            variant="h3"
+            sx={{
+              fontWeight: 900,
+              lineHeight: 1.1,
+              mb: 1.5,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
+            }}
+          >
+            {artist.name}
+          </Typography>
+          {artist.bio && (
+            <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.5, maxWidth: 600 }}>
+              {artist.bio}
+            </Typography>
+          )}
+        </Box>
+      </Box>
 
-      <div className={styles.controlsBar}>
-        <button className={styles.bigPlayBtn} onClick={handlePlayAll}>
-          ▶
-        </button>
-      </div>
+      {/* Controls */}
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, px: 4, py: 2.5 }}>
+        <Fab
+          color="primary"
+          onClick={handlePlayAll}
+          sx={{
+            width: 56,
+            height: 56,
+            '&:hover': { transform: 'scale(1.06)', bgcolor: 'primary.light' },
+          }}
+        >
+          <PlayArrowIcon sx={{ fontSize: 28 }} />
+        </Fab>
+      </Box>
 
-      <div className={styles.trackSection}>
+      {/* Content */}
+      <Box sx={{ px: 4, pb: 4 }}>
         {allSongs.length > 0 && (
           <>
-            <h2 className={styles.sectionTitle}>Popular</h2>
+            <Typography variant="h5" fontWeight={700} sx={{ mb: 2, mt: 2 }}>
+              Popular
+            </Typography>
             <TrackList tracks={allSongs.slice(0, 5)} showHeader={false} />
           </>
         )}
 
         {artist.albums?.length > 0 && (
           <>
-            <h2 className={styles.sectionTitle}>Discography</h2>
+            <Typography variant="h5" fontWeight={700} sx={{ mb: 2, mt: 4 }}>
+              Discography
+            </Typography>
             <CardGrid>
               {artist.albums.map((album: any, i: number) => (
                 <Card
@@ -84,7 +161,7 @@ export default function ArtistPage() {
             </CardGrid>
           </>
         )}
-      </div>
-    </div>
+      </Box>
+    </Box>
   );
 }

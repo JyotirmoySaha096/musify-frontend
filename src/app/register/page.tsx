@@ -3,7 +3,13 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import styles from '../login/auth.module.css';
+import Box from '@mui/material/Box';
+import Paper from '@mui/material/Paper';
+import Typography from '@mui/material/Typography';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+import Alert from '@mui/material/Alert';
+import Avatar from '@mui/material/Avatar';
 import { useAuth } from '@/context/AuthContext';
 
 export default function RegisterPage() {
@@ -30,72 +36,136 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className={styles.authPage}>
-      <div className={styles.authCard}>
-        <div className={styles.authLogo}>
-          <div className={styles.authLogoIcon}>♪</div>
-          <h1 className={styles.authTitle}>Sign up for Spotify</h1>
-          <p className={styles.authSubtitle}>Create a free account</p>
-        </div>
+    <Box
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: 'calc(100vh - 90px)',
+        p: 3,
+      }}
+    >
+      <Paper
+        elevation={0}
+        sx={{
+          width: '100%',
+          maxWidth: 400,
+          bgcolor: 'background.paper',
+          borderRadius: 3,
+          p: '40px 32px',
+          animation: 'fadeIn 0.4s ease',
+        }}
+      >
+        <Box sx={{ textAlign: 'center', mb: 4 }}>
+          <Avatar
+            sx={{
+              width: 48,
+              height: 48,
+              background: 'linear-gradient(135deg, #1DB954, #1ed760)',
+              fontSize: 24,
+              mx: 'auto',
+              mb: 2,
+            }}
+          >
+            ♪
+          </Avatar>
+          <Typography variant="h5" fontWeight={800}>
+            Sign up for Spotify
+          </Typography>
+          <Typography variant="body2" color="text.disabled" sx={{ mt: 1 }}>
+            Create a free account
+          </Typography>
+        </Box>
 
-        {error && <div className={styles.error}>{error}</div>}
+        {error && (
+          <Alert severity="error" sx={{ mb: 2, bgcolor: 'rgba(220,53,69,0.15)', color: '#ff6b7a' }}>
+            {error}
+          </Alert>
+        )}
 
-        <form className={styles.form} onSubmit={handleSubmit}>
-          <div className={styles.inputGroup}>
-            <label className={styles.label}>Email address</label>
-            <input
+        <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <Box>
+            <Typography variant="caption" fontWeight={600} sx={{ mb: 0.75, display: 'block' }}>
+              Email address
+            </Typography>
+            <TextField
               type="email"
-              className={styles.input}
               placeholder="name@domain.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              fullWidth
               id="register-email"
             />
-          </div>
+          </Box>
 
-          <div className={styles.inputGroup}>
-            <label className={styles.label}>Username</label>
-            <input
+          <Box>
+            <Typography variant="caption" fontWeight={600} sx={{ mb: 0.75, display: 'block' }}>
+              Username
+            </Typography>
+            <TextField
               type="text"
-              className={styles.input}
               placeholder="What should we call you?"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               required
+              fullWidth
               id="register-username"
             />
-          </div>
+          </Box>
 
-          <div className={styles.inputGroup}>
-            <label className={styles.label}>Password</label>
-            <input
+          <Box>
+            <Typography variant="caption" fontWeight={600} sx={{ mb: 0.75, display: 'block' }}>
+              Password
+            </Typography>
+            <TextField
               type="password"
-              className={styles.input}
               placeholder="Create a password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              minLength={6}
+              fullWidth
               id="register-password"
+              inputProps={{ minLength: 6 }}
             />
-          </div>
+          </Box>
 
-          <button
+          <Button
             type="submit"
-            className={styles.submitBtn}
+            variant="contained"
+            color="primary"
+            fullWidth
             disabled={loading}
             id="register-submit"
+            sx={{
+              py: 1.5,
+              fontSize: 15,
+              mt: 1,
+              borderRadius: 100,
+              '&:disabled': { opacity: 0.5 },
+            }}
           >
             {loading ? 'Creating account...' : 'Sign Up'}
-          </button>
-        </form>
+          </Button>
+        </Box>
 
-        <div className={styles.switchLink}>
+        <Typography variant="body2" color="text.disabled" sx={{ textAlign: 'center', mt: 3 }}>
           Already have an account?{' '}
-          <Link href="/login">Log in here</Link>
-        </div>
-      </div>
-    </div>
+          <Typography
+            component={Link}
+            href="/login"
+            variant="body2"
+            sx={{
+              color: 'text.primary',
+              fontWeight: 600,
+              textDecoration: 'underline',
+              '&:hover': { color: 'primary.main' },
+            }}
+          >
+            Log in here
+          </Typography>
+        </Typography>
+      </Paper>
+    </Box>
   );
 }
