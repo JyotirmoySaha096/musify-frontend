@@ -20,6 +20,7 @@ interface Track {
   id: string;
   title: string;
   durationSeconds: number;
+  audioUrl: string;
   trackNumber?: number;
   artist: { id: string; name: string };
   album: { id: string; title: string; coverUrl: string };

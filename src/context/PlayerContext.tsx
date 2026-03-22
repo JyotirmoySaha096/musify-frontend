@@ -8,12 +8,13 @@ import React, {
   useCallback,
   useEffect,
 } from 'react';
-import { songsApi } from '@/lib/api';
+
 
 interface Track {
   id: string;
   title: string;
   durationSeconds: number;
+  audioUrl: string;
   artist: { id: string; name: string };
   album: { id: string; title: string; coverUrl: string };
 }
@@ -180,7 +181,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     if (!audio) return;
 
     if (state.currentTrack) {
-      audio.src = songsApi.streamUrl(state.currentTrack.id);
+      audio.src = state.currentTrack.audioUrl;
       if (state.isPlaying) {
         audio.play().catch(() => {});
       }

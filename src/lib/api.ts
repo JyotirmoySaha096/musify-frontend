@@ -53,8 +53,6 @@ export const songsApi = {
     request<any[]>(`/songs${limit ? `?limit=${limit}` : ''}`),
   getOne: (id: string) =>
     request<any>(`/songs/${id}`),
-  streamUrl: (id: string) =>
-    `${API_BASE}/songs/${id}/stream`,
 };
 
 // Albums
