@@ -178,14 +178,34 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
   // Handle audio element events
   useEffect(() => {
     const audio = audioRef.current;
-    if (!audio) return;
+    if (!audio || !state.currentTrack) return;
 
-    if (state.currentTrack) {
-      audio.src = state.currentTrack.audioUrl;
-      if (state.isPlaying) {
-        audio.play().catch(() => {});
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+    const authToken = localStorage.getItem('spotify_token');
+
+    const fetchTokenAndPlay = async () => {
+      try {
+        const res = await fetch(
+          `${apiUrl}/songs/${state.currentTrack!.id}/stream-token`,
+          {
+            headers: authToken ? { Authorization: `Bearer ${authToken}` } : {},
+          },
+        );
+        if (!res.ok) {
+          console.error('Failed to get stream token');
+          return;
+        }
+        const { token } = await res.json();
+        audio.src = `${apiUrl}/songs/${state.currentTrack!.id}/stream?token=${token}`;
+        if (state.isPlaying) {
+          audio.play().catch(() => {});
+        }
+      } catch (err) {
+        console.error('Stream token error:', err);
       }
-    }
+    };
+
+    fetchTokenAndPlay();
   }, [state.currentTrack]);
 
   useEffect(() => {
@@ -243,7 +263,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         addToQueue,
       }}
     >
-      <audio ref={audioRef} preload="auto" />
+      <audio ref={audioRef} preload="metadata" />
       {children}
     </PlayerContext.Provider>
   );

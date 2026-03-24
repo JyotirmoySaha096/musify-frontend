@@ -6,6 +6,7 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Fab from '@mui/material/Fab';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import PauseIcon from '@mui/icons-material/Pause';
 import TrackList from '@/components/TrackList/TrackList';
 import Card, { CardGrid } from '@/components/Card/Card';
 import { artistsApi } from '@/lib/api';
@@ -15,7 +16,7 @@ export default function ArtistPage() {
   const params = useParams();
   const [artist, setArtist] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const { playTrack } = usePlayer();
+  const { playTrack, currentTrack, isPlaying, togglePlay, queue } = usePlayer();
 
   useEffect(() => {
     if (params.id) {
@@ -49,8 +50,18 @@ export default function ArtistPage() {
 
   const allSongs = artist.songs || [];
 
+  // Compare queue by identity to distinguish same song in different contexts
+  const isThisContextActive =
+    currentTrack && allSongs.length > 0 &&
+    allSongs.some((s: any) => s.id === currentTrack.id) &&
+    queue.length === allSongs.length &&
+    queue.every((q, i) => q.id === allSongs[i]?.id);
+  const isThisContextPlaying = isPlaying && isThisContextActive;
+
   const handlePlayAll = () => {
-    if (allSongs.length > 0) {
+    if (isThisContextActive) {
+      togglePlay();
+    } else if (allSongs.length > 0) {
       playTrack(allSongs[0], allSongs, 0);
     }
   };
@@ -126,7 +137,7 @@ export default function ArtistPage() {
             '&:hover': { transform: 'scale(1.06)', bgcolor: 'primary.light' },
           }}
         >
-          <PlayArrowIcon sx={{ fontSize: 28 }} />
+          {isThisContextPlaying ? <PauseIcon sx={{ fontSize: 28 }} /> : <PlayArrowIcon sx={{ fontSize: 28 }} />}
         </Fab>
       </Box>
 

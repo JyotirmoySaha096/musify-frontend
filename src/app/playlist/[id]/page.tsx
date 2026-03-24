@@ -6,6 +6,7 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Fab from '@mui/material/Fab';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import PauseIcon from '@mui/icons-material/Pause';
 import TrackList from '@/components/TrackList/TrackList';
 import { playlistsApi } from '@/lib/api';
 import { usePlayer } from '@/context/PlayerContext';
@@ -14,7 +15,7 @@ export default function PlaylistPage() {
   const params = useParams();
   const [playlist, setPlaylist] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const { playTrack } = usePlayer();
+  const { playTrack, currentTrack, isPlaying, togglePlay, queue } = usePlayer();
 
   useEffect(() => {
     if (params.id) {
@@ -48,10 +49,29 @@ export default function PlaylistPage() {
 
   const songs = playlist.playlistSongs?.map((ps: any) => ps.song).filter(Boolean) || [];
 
+  // "Active" = the player's queue was set from this playlist's songs
+  // Compare by checking if the currentTrack is in THIS page's song list AND
+  // the queue length matches (handles same song appearing in multiple contexts)
+  const isThisContextActive =
+    currentTrack && songs.length > 0 &&
+    songs.some((s: any) => s.id === currentTrack.id) &&
+    queue.length === songs.length &&
+    queue.every((q, i) => q.id === songs[i]?.id);
+  const isThisContextPlaying = isPlaying && isThisContextActive;
+
   const handlePlayAll = () => {
-    if (songs.length > 0) {
+    if (isThisContextActive) {
+      togglePlay();
+    } else if (songs.length > 0) {
       playTrack(songs[0], songs, 0);
     }
+  };
+
+  const handleRemovedFromPlaylist = (songId: string) => {
+    setPlaylist((prev: any) => ({
+      ...prev,
+      playlistSongs: prev.playlistSongs?.filter((ps: any) => ps.song?.id !== songId),
+    }));
   };
 
   return (
@@ -127,14 +147,14 @@ export default function PlaylistPage() {
             '&:hover': { transform: 'scale(1.06)', bgcolor: 'primary.light' },
           }}
         >
-          <PlayArrowIcon sx={{ fontSize: 28 }} />
+          {isThisContextPlaying ? <PauseIcon sx={{ fontSize: 28 }} /> : <PlayArrowIcon sx={{ fontSize: 28 }} />}
         </Fab>
       </Box>
 
       {/* Track List */}
       <Box sx={{ px: 4, pb: 4 }}>
         {songs.length > 0 ? (
-          <TrackList tracks={songs} />
+          <TrackList tracks={songs} playlistId={params.id as string} onRemovedFromPlaylist={handleRemovedFromPlaylist} />
         ) : (
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 200 }}>
             <Typography variant="body2" color="text.disabled">

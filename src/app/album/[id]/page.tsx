@@ -8,6 +8,7 @@ import Typography from '@mui/material/Typography';
 import Fab from '@mui/material/Fab';
 import Skeleton from '@mui/material/Skeleton';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import PauseIcon from '@mui/icons-material/Pause';
 import TrackList from '@/components/TrackList/TrackList';
 import { albumsApi } from '@/lib/api';
 import { usePlayer } from '@/context/PlayerContext';
@@ -16,7 +17,7 @@ export default function AlbumPage() {
   const params = useParams();
   const [album, setAlbum] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const { playTrack } = usePlayer();
+  const { playTrack, currentTrack, isPlaying, togglePlay, queue } = usePlayer();
 
   useEffect(() => {
     if (params.id) {
@@ -48,8 +49,22 @@ export default function AlbumPage() {
     );
   }
 
+  const albumSongs = album.songs || [];
+
+  // Queue-comparison: handles the edge case where the same song exists in
+  // multiple contexts (e.g. album + playlist + liked songs)
+  const isThisAlbumActive =
+    currentTrack && albumSongs.length > 0 &&
+    albumSongs.some((s: any) => s.id === currentTrack.id) &&
+    queue.length === albumSongs.length &&
+    queue.every((q, i) => q.id === albumSongs[i]?.id);
+  const isThisAlbumPlaying = isPlaying && isThisAlbumActive;
+
   const handlePlayAll = () => {
-    if (album.songs?.length > 0) {
+    if (isThisAlbumActive) {
+      // This album's track is loaded — just toggle pause/resume
+      togglePlay();
+    } else if (album.songs?.length > 0) {
       playTrack(album.songs[0], album.songs, 0);
     }
   };
@@ -142,7 +157,7 @@ export default function AlbumPage() {
             '&:hover': { transform: 'scale(1.06)', bgcolor: 'primary.light' },
           }}
         >
-          <PlayArrowIcon sx={{ fontSize: 28 }} />
+          {isThisAlbumPlaying ? <PauseIcon sx={{ fontSize: 28 }} /> : <PlayArrowIcon sx={{ fontSize: 28 }} />}
         </Fab>
       </Box>
 

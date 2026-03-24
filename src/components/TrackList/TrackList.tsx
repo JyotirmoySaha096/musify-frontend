@@ -15,6 +15,7 @@ import Avatar from '@mui/material/Avatar';
 import MusicNoteIcon from '@mui/icons-material/MusicNote';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import { usePlayer } from '@/context/PlayerContext';
+import TrackActions from './TrackActions';
 
 interface Track {
   id: string;
@@ -30,6 +31,9 @@ interface TrackListProps {
   tracks: Track[];
   showAlbum?: boolean;
   showHeader?: boolean;
+  /** If set, shows "Remove from playlist" instead of the add-to-playlist menu */
+  playlistId?: string;
+  onRemovedFromPlaylist?: (songId: string) => void;
 }
 
 function formatDuration(seconds: number): string {
@@ -42,6 +46,8 @@ export default function TrackList({
   tracks,
   showAlbum = true,
   showHeader = true,
+  playlistId,
+  onRemovedFromPlaylist,
 }: TrackListProps) {
   const { playTrack, currentTrack, isPlaying } = usePlayer();
 
@@ -71,6 +77,7 @@ export default function TrackList({
             return (
               <TableRow
                 key={track.id}
+                className="track-row"
                 onClick={() => handlePlayTrack(track, index)}
                 sx={{
                   animation: 'fadeIn 0.3s ease forwards',
@@ -161,9 +168,16 @@ export default function TrackList({
                 )}
 
                 <TableCell align="right">
-                  <Typography variant="body2" color="text.disabled" sx={{ fontVariantNumeric: 'tabular-nums' }}>
-                    {formatDuration(track.durationSeconds)}
-                  </Typography>
+                  <Stack direction="row" alignItems="center" justifyContent="flex-end" spacing={0.5}>
+                    <TrackActions
+                      songId={track.id}
+                      playlistId={playlistId}
+                      onRemovedFromPlaylist={onRemovedFromPlaylist}
+                    />
+                    <Typography variant="body2" color="text.disabled" sx={{ fontVariantNumeric: 'tabular-nums', minWidth: 36, textAlign: 'right' }}>
+                      {formatDuration(track.durationSeconds)}
+                    </Typography>
+                  </Stack>
                 </TableCell>
               </TableRow>
             );
